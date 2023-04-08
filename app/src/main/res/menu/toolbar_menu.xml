@@ -15,7 +15,7 @@
 
             <item
                 android:id="@+id/add_posts"
-                android:title="@string/add_posts"/>
+                android:title="@string/add_post"/>
             <item
                 android:id="@+id/my_posts"
                 android:title="@string/my_posts"/>

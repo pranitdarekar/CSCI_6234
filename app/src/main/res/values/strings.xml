@@ -11,10 +11,9 @@
     <string name="edit_profile">Edit Profile</string>
     <string name="my_posts">My Posts</string>
     <string name="my_followers">My Followers</string>
-    <string name="add_posts">Add Posts</string>
+    <string name="add_post">Add Post</string>
     <string name="select">Select</string>
     <string name="upload">Upload</string>
-    <string name="add_post">ADD POST</string>
     <string name="select_image">Select Image</string>
     <string name="upload_image">Upload Image</string>
     <string name="caption_hint">Write Caption..</string>

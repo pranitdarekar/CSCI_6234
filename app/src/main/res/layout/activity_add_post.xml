@@ -35,7 +35,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="@string/add_post"
+        android:text="ADD POST"
         android:textColor="@color/black"
         android:textSize="26sp"
         android:textStyle="bold"
@@ -53,6 +53,7 @@
         app:layout_constraintTop_toBottomOf="@+id/add_post"
         android:layout_marginHorizontal="16dp"
         android:layout_marginVertical="30dp"
+        android:layout_marginBottom="16dp"
         tools:srcCompat="@tools:sample/avatars" />
 
     <EditText
@@ -60,6 +61,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        app:layout_constraintTop_toBottomOf="@+id/post_image"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintBottom_toTopOf="@id/select_image"
         android:hint="@string/caption_hint"

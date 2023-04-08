@@ -30,12 +30,12 @@ public class MainActivity extends AppCompatActivity {
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
 
+        auth = FirebaseAuth.getInstance();
+        user = auth.getCurrentUser();
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(user.getEmail());
 
-        auth = FirebaseAuth.getInstance();
-        user = auth.getCurrentUser();
 //        username = findViewById(R.id.username);
 //        if (user == null) {
 //            Intent intent = new Intent(getApplicationContext(), Login.class);
