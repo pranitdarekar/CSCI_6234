@@ -1,0 +1,27 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/main_menu"
+        android:title="settings"
+        android:icon="@drawable/menu"
+        app:showAsAction="always">
+
+        <menu
+            android:id="@+id/menu_item">
+            <item
+                android:id="@+id/edit_profile"
+                android:title="@string/edit_profile"/>
+            <item
+                android:id="@+id/my_posts"
+                android:title="@string/my_posts"/>
+            <item
+                android:id="@+id/my_followers"
+                android:title="@string/my_followers"/>
+            <item
+                android:id="@+id/logout"
+                android:title="@string/logout"/>
+        </menu>
+    </item>
+
+</menu>
