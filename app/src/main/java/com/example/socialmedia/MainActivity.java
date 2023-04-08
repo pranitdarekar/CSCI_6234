@@ -19,7 +19,6 @@ import com.google.firebase.auth.FirebaseUser;
 public class MainActivity extends AppCompatActivity {
 
     FirebaseAuth auth;
-    Button buttonLogout;
     TextView username;
     FirebaseUser user;
 
@@ -31,11 +30,13 @@ public class MainActivity extends AppCompatActivity {
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
 
-        auth = FirebaseAuth.getInstance();
         toolbar = findViewById(R.id.toolbar);
-//        buttonLogout = findViewById(R.id.logout);
-//        username = findViewById(R.id.username);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle(user.getEmail());
+
+        auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
+//        username = findViewById(R.id.username);
 //        if (user == null) {
 //            Intent intent = new Intent(getApplicationContext(), Login.class);
 //            startActivity(intent);
@@ -43,19 +44,6 @@ public class MainActivity extends AppCompatActivity {
 //        } else {
 //            username.setText(user.getEmail());
 //        }
-
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(user.getEmail());
-
-    //        buttonLogout.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                FirebaseAuth.getInstance().signOut();
-//                Intent intent = new Intent(getApplicationContext(), Login.class);
-//                startActivity(intent);
-//                finish();
-//            }
-//        });
     }
 
     @Override
@@ -70,11 +58,16 @@ public class MainActivity extends AppCompatActivity {
                     // Handle submenu item tap
                     switch (item.getItemId()) {
                         case R.id.add_posts:
-                            Intent intent = new Intent(getApplicationContext(), AddPost.class);
-                            startActivity(intent);
+                            Intent addPostIntent = new Intent(getApplicationContext(), AddPost.class);
+                            startActivity(addPostIntent);
                             finish();
-                        case R.id.edit_profile:
-                            return true;
+                            break;
+                        case R.id.logout:
+                            FirebaseAuth.getInstance().signOut();
+                            Intent logoutIntent = new Intent(getApplicationContext(), Login.class);
+                            startActivity(logoutIntent);
+                            finish();
+                            break;
                     }
                     return true;
                 }
@@ -82,21 +75,4 @@ public class MainActivity extends AppCompatActivity {
         }
         return true;
     }
-
-
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        switch (item.getItemId()) {
-//            case R.id.edit_profile:
-//                System.out.println("teststtt");
-//                return true;
-//            case R.id.my_posts:
-//                return false;
-//            case R.id.add_posts:
-//            default:
-//                return super.onOptionsItemSelected(item);
-//        }
-//    }
-
-
 }
