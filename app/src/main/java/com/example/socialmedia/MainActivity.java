@@ -68,6 +68,14 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
                     // Handle submenu item tap
+                    switch (item.getItemId()) {
+                        case R.id.add_posts:
+                            Intent intent = new Intent(getApplicationContext(), AddPost.class);
+                            startActivity(intent);
+                            finish();
+                        case R.id.edit_profile:
+                            return true;
+                    }
                     return true;
                 }
             });
@@ -76,19 +84,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.edit_profile:
-                return true;
-            case R.id.my_posts:
-                return false;
-            case R.id.logout:
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        switch (item.getItemId()) {
+//            case R.id.edit_profile:
+//                System.out.println("teststtt");
+//                return true;
+//            case R.id.my_posts:
+//                return false;
+//            case R.id.add_posts:
+//            default:
+//                return super.onOptionsItemSelected(item);
+//        }
+//    }
 
 
 }

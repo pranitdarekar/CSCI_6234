@@ -12,6 +12,10 @@
             <item
                 android:id="@+id/edit_profile"
                 android:title="@string/edit_profile"/>
+
+            <item
+                android:id="@+id/add_posts"
+                android:title="@string/add_posts"/>
             <item
                 android:id="@+id/my_posts"
                 android:title="@string/my_posts"/>
