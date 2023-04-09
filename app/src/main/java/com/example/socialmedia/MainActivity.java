@@ -68,6 +68,11 @@ public class MainActivity extends AppCompatActivity {
                             startActivity(logoutIntent);
                             finish();
                             break;
+                        case R.id.edit_profile:
+                            Intent editProfileIntent = new Intent(getApplicationContext(), EditProfile.class);
+                            startActivity(editProfileIntent);
+                            finish();
+                            break;
                     }
                     return true;
                 }

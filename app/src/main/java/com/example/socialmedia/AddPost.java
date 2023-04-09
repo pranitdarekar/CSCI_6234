@@ -133,6 +133,12 @@ public class AddPost extends AppCompatActivity {
                             startActivity(logoutIntent);
                             finish();
                             break;
+                        case R.id.edit_profile:
+                            FirebaseAuth.getInstance().signOut();
+                            Intent editProfileIntent = new Intent(getApplicationContext(), EditProfile.class);
+                            startActivity(editProfileIntent);
+                            finish();
+                            break;
                     }
                     return true;
                 }
@@ -170,7 +176,6 @@ public class AddPost extends AppCompatActivity {
 
                                         Upload upload = new Upload(imageUrl, caption, uid);
                                         String uploadId = databaseReference.push().getKey();
-                                        System.out.println("=========================");
                                         System.out.println(uploadId);
                                         databaseReference.child(uploadId).setValue(upload);
 
