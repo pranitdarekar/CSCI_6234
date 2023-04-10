@@ -17,11 +17,11 @@
                 android:id="@+id/add_posts"
                 android:title="@string/add_post"/>
             <item
-                android:id="@+id/my_posts"
-                android:title="@string/my_posts"/>
+                android:id="@+id/my_page"
+                android:title="@string/my_page"/>
             <item
-                android:id="@+id/my_followers"
-                android:title="@string/my_followers"/>
+                android:id="@+id/search_user"
+                android:title="@string/search_user"/>
             <item
                 android:id="@+id/logout"
                 android:title="@string/logout"/>

@@ -17,4 +17,6 @@
     <string name="select_image">Select Image</string>
     <string name="upload_image">Upload Image</string>
     <string name="caption_hint">Write Caption..</string>
+    <string name="my_page">My Page</string>
+    <string name="search_user">Search User</string>
 </resources>
