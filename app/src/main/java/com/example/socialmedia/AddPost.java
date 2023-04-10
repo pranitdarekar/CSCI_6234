@@ -55,7 +55,7 @@ public class AddPost extends AppCompatActivity {
 
     Toolbar toolbar;
 
-    private ActivityResultLauncher<Intent> chooseImageLauncher;
+    ActivityResultLauncher<Intent> chooseImageLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,7 +134,6 @@ public class AddPost extends AppCompatActivity {
                             finish();
                             break;
                         case R.id.edit_profile:
-                            FirebaseAuth.getInstance().signOut();
                             Intent editProfileIntent = new Intent(getApplicationContext(), EditProfile.class);
                             startActivity(editProfileIntent);
                             finish();
