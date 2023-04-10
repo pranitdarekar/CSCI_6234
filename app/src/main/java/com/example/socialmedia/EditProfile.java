@@ -55,7 +55,6 @@ public class EditProfile extends AppCompatActivity {
 
                     databaseReference.child("users").child(userId).setValue(user);
                     Toast.makeText(EditProfile.this, "Profile updated successfully", Toast.LENGTH_SHORT).show();
-                    finish();
                 }
             }
         });
