@@ -20,6 +20,9 @@
                 android:id="@+id/my_page"
                 android:title="@string/my_page"/>
             <item
+                android:id="@+id/home_page"
+                android:title="@string/home_page"/>
+            <item
                 android:id="@+id/search_user"
                 android:title="@string/search_user"/>
             <item

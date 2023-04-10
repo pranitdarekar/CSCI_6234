@@ -138,6 +138,11 @@ public class AddPost extends AppCompatActivity {
                             startActivity(editProfileIntent);
                             finish();
                             break;
+                        case R.id.search_user:
+                            Intent searchUserIntent = new Intent(getApplicationContext(), SearchUser.class);
+                            startActivity(searchUserIntent);
+                            finish();
+                            break;
                     }
                     return true;
                 }

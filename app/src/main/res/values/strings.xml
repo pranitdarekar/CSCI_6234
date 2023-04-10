@@ -19,4 +19,5 @@
     <string name="caption_hint">Write Caption..</string>
     <string name="my_page">My Page</string>
     <string name="search_user">Search User</string>
+    <string name="home_page">Home Page</string>
 </resources>
