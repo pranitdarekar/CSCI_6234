@@ -21,7 +21,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -74,9 +73,6 @@ public class EditProfile extends AppCompatActivity {
         String userId = firebaseAuth.getCurrentUser().getUid();
         StorageReference profilePicRef = storageRef.child("profile_pictures/" + userId);
 
-        Glide.with(EditProfile.this)
-                .load(profilePicRef)
-                .into(profilePictureImageView);
 
         // Set up the activity result launcher to pick an image
         launcher = registerForActivityResult(new ActivityResultContracts.GetContent(),
