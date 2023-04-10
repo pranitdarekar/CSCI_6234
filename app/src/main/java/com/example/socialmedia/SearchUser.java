@@ -1,5 +1,6 @@
 package com.example.socialmedia;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -77,7 +78,10 @@ public class SearchUser extends AppCompatActivity {
                                     if (result != null && result.getSignInMethods() != null
                                             && result.getSignInMethods().contains(EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD)) {
                                         // User exists
-                                        Toast.makeText(SearchUser.this, "User exists", Toast.LENGTH_SHORT).show();
+                                        Intent intent = new Intent(SearchUser.this, OtherUser.class);
+                                        intent.putExtra("seachedUsername", username);
+                                        startActivity(intent);
+                                        finish();
                                     } else {
                                         // User does not exist
                                         Toast.makeText(SearchUser.this, "User does not exist", Toast.LENGTH_SHORT).show();
