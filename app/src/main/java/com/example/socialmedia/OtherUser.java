@@ -13,7 +13,7 @@ import android.view.SubMenu;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
@@ -35,7 +35,7 @@ import java.util.Objects;
 
 public class OtherUser extends AppCompatActivity {
 
-    EditText bioEditText;
+    TextView bioTextView;
     Button followButton;
 
     Toolbar toolbar;
@@ -53,14 +53,13 @@ public class OtherUser extends AppCompatActivity {
         otherUserEmail = getIntent().getStringExtra("searched_username");
         currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         followRequestsRef = FirebaseDatabase.getInstance().getReference().child("FollowRequests");
-
-        updateFollowRequest();
-
-        bioEditText = findViewById(R.id.bio_edit_text);
+        bioTextView = findViewById(R.id.bio_text_view);
         followButton = findViewById(R.id.follow_button);
         toolbar = findViewById(R.id.toolbar_other_user);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(otherUserEmail);
+
+        updateProfileComponents();
 
         followButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -127,7 +126,7 @@ public class OtherUser extends AppCompatActivity {
         return true;
     }
 
-    private void updateFollowRequest() {
+    private void updateProfileComponents() {
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("users");
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -143,45 +142,13 @@ public class OtherUser extends AppCompatActivity {
                     try {
                         if (userObject.has("email") && Objects.equals(otherUserEmail, userObject.getString("email"))) {
                             otherUserId = key;
-                            // Check if the current user is following the visited user
-                            followRequestsRef.child(currentUserId).child(otherUserId).addValueEventListener(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                    if (snapshot.exists()) {
-                                        String followState = snapshot.getValue(String.class);
-                                        if (followState.equals("Accepted")) {
-                                            // The current user is following the visited user
-                                            isFollowing = true;
-                                            followButton.setText("Following");
-                                        } else if (followState.equals("Pending")) {
-                                            // The current user has sent a follow request to the visited user
-                                            isFollowing = false;
-                                            followButton.setText("Request Sent");
-                                        } else {
-                                            // The current user is not following the visited user
-                                            isFollowing = false;
-                                            followButton.setText("Follow");
-                                        }
-                                    } else {
-                                        // The current user is not following the visited user
-                                        isFollowing = false;
-                                        followButton.setText("Follow");
-                                    }
-                                }
-
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError error) {
-                                    Log.e("ProfileActivity", "Failed to read follow request", error.toException());
-                                }
-                            });
+                            updateFollowButton();
+                            updateBioText();
                             break;
                         }
                     } catch (JSONException e) {
                         throw new RuntimeException(e);
                     }
-
-                    // print the key and value
-                    Log.d("FirebaseData", "Key: " + key + " Value: " + userMap);
                 }
             }
 
@@ -190,6 +157,60 @@ public class OtherUser extends AppCompatActivity {
                 Log.e("FirebaseError", "Error reading data", databaseError.toException());
             }
         });
+    }
+
+    private void updateFollowButton() {
+        followRequestsRef.child(currentUserId).child(otherUserId).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    String followState = snapshot.getValue(String.class);
+                    if (followState.equals("Accepted")) {
+                        // The current user is following the visited user
+                        isFollowing = true;
+                        followButton.setText("Following");
+                    } else if (followState.equals("Pending")) {
+                        // The current user has sent a follow request to the visited user
+                        isFollowing = false;
+                        followButton.setText("Request Sent");
+                    } else {
+                        // The current user is not following the visited user
+                        isFollowing = false;
+                        followButton.setText("Follow");
+                    }
+                } else {
+                    // The current user is not following the visited user
+                    isFollowing = false;
+                    followButton.setText("Follow");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e("ProfileActivity", "Failed to read follow request", error.toException());
+            }
+        });
+    }
+
+    private void updateBioText() {
+        DatabaseReference bioRef = FirebaseDatabase.getInstance().getReference("users/" + otherUserId + "/bio");
+        System.out.println(bioRef);
+
+        bioRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    String bio = dataSnapshot.getValue(String.class);
+                    bioTextView.setText(bio);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e("FirebaseError", "Error reading bio from database", databaseError.toException());
+            }
+        });
+
     }
 
 }
