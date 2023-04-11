@@ -175,9 +175,11 @@ public class EditProfile extends AppCompatActivity {
     }
 
     private void setProfilePicture(String url) {
-        Glide.with(getApplicationContext())
-                .load(url)
-                .into(profilePictureImageView);
+        if (url != null) {
+            Glide.with(getApplicationContext())
+                    .load(url)
+                    .into(profilePictureImageView);
+        }
     }
 
     @Override
