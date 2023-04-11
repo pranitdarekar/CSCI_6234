@@ -1,8 +1,11 @@
 package com.example.socialmedia;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,16 +17,21 @@ import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -50,6 +58,7 @@ public class MyPage extends AppCompatActivity {
     ImageView profilePictureImage;
     RecyclerView recyclerView;
     ImageAdapter adapter;
+    Button followRequestsButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +70,7 @@ public class MyPage extends AppCompatActivity {
         bioTextView = findViewById(R.id.bio_text_view);
         userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         profilePictureImage = findViewById(R.id.profile_image_view);
+        followRequestsButton = findViewById(R.id.follow_requests_button);
 
         recyclerView = findViewById(R.id.images_grid);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
@@ -71,6 +81,7 @@ public class MyPage extends AppCompatActivity {
         getSupportActionBar().setTitle("");
 
         updateProfileComponents();
+        attachClickListeners();
 
     }
 
@@ -128,6 +139,127 @@ public class MyPage extends AppCompatActivity {
         updateBioText();
         updateProfilePicture();
         displayPosts();
+    }
+
+    private void attachClickListeners() {
+        followRequestsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showFollowRequests();
+            }
+        });
+    }
+
+    private void showFollowRequests() {
+        DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
+        databaseRef.child("FollowRequests").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<String> followRequests = new ArrayList<>();
+                String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                    Map<String, Object> userMap = (Map<String, Object>) ds.getValue();
+                    JSONObject requestsObject = new JSONObject(userMap);
+                    try {
+                        if (requestsObject.has(uid) && requestsObject.getString(uid).equals("Pending")) {
+                            String request = ds.getKey();
+                            FirebaseDatabase.getInstance().getReference("path/to/your/node").addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    String value = dataSnapshot.getValue(String.class);
+                                    Log.d("TAG", "Value at node: " + value);
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+                                    Log.e("TAG", "Error reading value from database: " + databaseError.getMessage());
+                                }
+                            });
+
+                            followRequests.add(request);
+                        }
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                showFollowRequestsDialog(followRequests);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e("TAG", "Failed to fetch follow requests.", error.toException());
+            }
+        });
+    }
+
+    private void showFollowRequestsDialog(List<String> requests) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Follow Requests");
+        if (requests.isEmpty()) {
+            builder.setMessage("There are no follow requests to show.");
+        } else {
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(MyPage.this, android.R.layout.simple_list_item_1, requests);
+            builder.setAdapter(adapter, null);
+
+            builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    String request = requests.get(which);
+                    showConfirmDialog(request);
+                }
+            });
+        }
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void showConfirmDialog(String request) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Confirm");
+        builder.setMessage("Do you want to accept the follow request from " + request + "?");
+        builder.setPositiveButton("Accept", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // TODO: accept the follow request
+                String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference("FollowRequests");
+
+                databaseRef.child(request).child(uid).setValue("Accepted")
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(MyPage.this, "Follow request accepted", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(MyPage.this, "Failed to accept follow request", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+            }
+        });
+        builder.setNegativeButton("Reject", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // TODO: reject the follow request
+                String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference("FollowRequests");
+
+                databaseRef.child(request).child(uid).setValue("Rejected")
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(MyPage.this, "Follow request rejected", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(MyPage.this, "Failed to reject follow request", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     private void updateBioText() {
