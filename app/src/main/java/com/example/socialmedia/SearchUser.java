@@ -131,6 +131,11 @@ public class SearchUser extends AppCompatActivity {
                             startActivity(searchUserIntent);
                             finish();
                             break;
+                        case R.id.my_page:
+                            Intent myPageIntent = new Intent(getApplicationContext(), MyPage.class);
+                            startActivity(myPageIntent);
+                            finish();
+                            break;
                     }
                     return true;
                 }

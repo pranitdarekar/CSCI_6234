@@ -19,7 +19,6 @@ import com.google.firebase.auth.FirebaseUser;
 public class MainActivity extends AppCompatActivity {
 
     FirebaseAuth auth;
-    TextView username;
     FirebaseUser user;
 
     Toolbar toolbar;
@@ -35,15 +34,6 @@ public class MainActivity extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(user.getEmail());
-
-//        username = findViewById(R.id.username);
-//        if (user == null) {
-//            Intent intent = new Intent(getApplicationContext(), Login.class);
-//            startActivity(intent);
-//            finish();
-//        } else {
-//            username.setText(user.getEmail());
-//        }
     }
 
     @Override
@@ -76,6 +66,11 @@ public class MainActivity extends AppCompatActivity {
                         case R.id.search_user:
                             Intent searchUserIntent = new Intent(getApplicationContext(), SearchUser.class);
                             startActivity(searchUserIntent);
+                            finish();
+                            break;
+                        case R.id.my_page:
+                            Intent myPageIntent = new Intent(getApplicationContext(), MyPage.class);
+                            startActivity(myPageIntent);
                             finish();
                             break;
                     }
