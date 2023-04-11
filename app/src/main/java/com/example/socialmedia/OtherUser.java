@@ -146,6 +146,11 @@ public class OtherUser extends AppCompatActivity {
                             startActivity(myPageIntent);
                             finish();
                             break;
+                        case R.id.home_page:
+                            Intent homePageIntent = new Intent(getApplicationContext(), MainActivity.class);
+                            startActivity(homePageIntent);
+                            finish();
+                            break;
                     }
                     return true;
                 }
@@ -286,14 +291,6 @@ public class OtherUser extends AppCompatActivity {
                     } catch (JSONException e) {
                         throw new RuntimeException(e);
                     }
-
-
-//                     Get the image URL from the database
-//                    String imageUrl = snapshot.child("url").getValue(String.class);
-
-//                     Create a new Image object and add it to the list
-//                    Image image = new Image(imageUrl);
-//                    adapter.addImage(image);
                 }
             }
 

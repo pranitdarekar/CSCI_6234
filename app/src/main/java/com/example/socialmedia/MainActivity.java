@@ -73,6 +73,11 @@ public class MainActivity extends AppCompatActivity {
                             startActivity(myPageIntent);
                             finish();
                             break;
+                        case R.id.home_page:
+                            Intent homePageIntent = new Intent(getApplicationContext(), MainActivity.class);
+                            startActivity(homePageIntent);
+                            finish();
+                            break;
                     }
                     return true;
                 }
