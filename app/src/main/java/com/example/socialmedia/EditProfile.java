@@ -141,7 +141,9 @@ public class EditProfile extends AppCompatActivity {
                             nameEditText.getText().toString().trim(),
                             bioEditText.getText().toString().trim(),
                             locationEditText.getText().toString().trim(),
-                            numberEditText.getText().toString().trim());
+                            numberEditText.getText().toString().trim(),
+                            fbUser.getUid(),
+                            fbUser.getEmail());
 
                     databaseReference.child("users").child(userId).setValue(user);
                     Toast.makeText(EditProfile.this, "Profile updated successfully", Toast.LENGTH_SHORT).show();
