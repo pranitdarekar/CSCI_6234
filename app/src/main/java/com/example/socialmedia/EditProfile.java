@@ -21,12 +21,16 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -36,6 +40,7 @@ public class EditProfile extends AppCompatActivity {
     EditText nameEditText, bioEditText, locationEditText, numberEditText;
     ImageView profilePictureImageView;
     Button saveButton, updatePictureButton;
+    String currentUserId;
 
     DatabaseReference databaseReference;
     FirebaseAuth firebaseAuth;
@@ -70,8 +75,10 @@ public class EditProfile extends AppCompatActivity {
         storage = FirebaseStorage.getInstance();
         storageRef = storage.getReference();
 
-        String userId = firebaseAuth.getCurrentUser().getUid();
-        StorageReference profilePicRef = storageRef.child("profile_pictures/" + userId);
+        currentUserId = firebaseAuth.getCurrentUser().getUid();
+        StorageReference profilePicRef = storageRef.child("profile_pictures/" + currentUserId);
+
+        updateProfilePictureUrl();
 
 
         // Set up the activity result launcher to pick an image
@@ -92,11 +99,12 @@ public class EditProfile extends AppCompatActivity {
                                     @Override
                                     public void onSuccess(Uri uri) {
                                         // Save the download URL to the user's profile in Firebase Realtime Database
-                                        databaseReference.child("users").child(userId).child("profilePicture").setValue(uri.toString())
+                                        databaseReference.child("users").child(currentUserId).child("profilePicture").setValue(uri.toString())
                                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override
                                                     public void onSuccess(Void aVoid) {
                                                         // Profile picture updated successfully
+                                                        setProfilePicture(uri.toString());
                                                         Toast.makeText(EditProfile.this, "Profile picture updated!", Toast.LENGTH_SHORT).show();
                                                     }
                                                 })
@@ -149,6 +157,27 @@ public class EditProfile extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void updateProfilePictureUrl() {
+        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference().child("users").child(currentUserId).child("profilePicture");
+        dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                setProfilePicture(dataSnapshot.getValue(String.class));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Handle error
+            }
+        });
+    }
+
+    private void setProfilePicture(String url) {
+        Glide.with(getApplicationContext())
+                .load(url)
+                .into(profilePictureImageView);
     }
 
     @Override
