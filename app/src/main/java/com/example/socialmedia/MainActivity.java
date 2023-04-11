@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(user.getEmail());
 
-        recyclerView = findViewById(R.id.images_grid_main);
+        recyclerView = findViewById(R.id.image_recycler_view);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 1));
         adapter = new ImageAdapter();
         recyclerView.setAdapter(adapter);
