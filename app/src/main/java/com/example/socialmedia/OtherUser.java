@@ -8,10 +8,12 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -19,6 +21,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -37,6 +41,8 @@ import com.google.firebase.storage.StorageReference;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -45,12 +51,13 @@ public class OtherUser extends AppCompatActivity {
     TextView bioTextView;
     Button followButton;
     ImageView profilePictureImage;
+    RecyclerView recyclerView;
+    ImageAdapter adapter;
 
     Toolbar toolbar;
     String currentUserEmail, otherUserEmail, otherUserId, currentUserId;
     boolean isFollowing;
     DatabaseReference followRequestsRef;
-    Uri newProfilePictureUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +73,12 @@ public class OtherUser extends AppCompatActivity {
         followButton = findViewById(R.id.follow_button);
         profilePictureImage = findViewById(R.id.profile_image_view);
         toolbar = findViewById(R.id.toolbar_other_user);
+
+        recyclerView = findViewById(R.id.images_grid);
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+        adapter = new ImageAdapter();
+        recyclerView.setAdapter(adapter);
+
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(otherUserEmail);
 
@@ -155,6 +168,9 @@ public class OtherUser extends AppCompatActivity {
                             updateFollowButton();
                             updateBioText();
                             updateProfilePicture();
+                            if (isFollowing) {
+                                displayPosts();
+                            }
                             break;
                         }
                     } catch (JSONException e) {
@@ -243,6 +259,112 @@ public class OtherUser extends AppCompatActivity {
         });
 
 
+    }
+
+    private void displayPosts() {
+        FirebaseDatabase.getInstance().getReference().child("uploads").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                // Clear the list to avoid duplicates
+                adapter.clear();
+
+                // Loop through all the images in the database
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    String key = snapshot.getKey();
+                    Map<String, Object> userMap = (Map<String, Object>) snapshot.getValue();
+
+                    // Create a JSONObject from the userMap
+                    JSONObject postsObj = new JSONObject(userMap);
+                    try {
+                        if (postsObj.has("imageUrl") && Objects.equals(otherUserId, postsObj.getString("uid"))) {
+                            Image image = new Image(postsObj.getString("imageUrl"));
+                            adapter.addImage(image);
+                        }
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+
+
+//                     Get the image URL from the database
+//                    String imageUrl = snapshot.child("url").getValue(String.class);
+
+//                     Create a new Image object and add it to the list
+//                    Image image = new Image(imageUrl);
+//                    adapter.addImage(image);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Handle errors here
+            }
+        });
+    }
+
+    private class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHolder> {
+        private List<Image> mImages;
+
+        public ImageAdapter() {
+            mImages = new ArrayList<>();
+        }
+
+        public void clear() {
+            mImages.clear();
+            notifyDataSetChanged();
+        }
+
+        public void addImage(Image image) {
+            mImages.add(image);
+            notifyDataSetChanged();
+        }
+
+        @NonNull
+        @Override
+        public ImageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.cardview_image, parent, false);
+            return new ImageViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull ImageViewHolder holder, int position) {
+            Image image = mImages.get(position);
+
+            // Load the image using Glide or Picasso
+            Glide.with(holder.itemView.getContext())
+                    .load(image.getUrl())
+                    .into(holder.imageView);
+        }
+
+        @Override
+        public int getItemCount() {
+            return mImages.size();
+        }
+
+        private class ImageViewHolder extends RecyclerView.ViewHolder {
+            private ImageView imageView;
+
+            public ImageViewHolder(@NonNull View itemView) {
+                super(itemView);
+                imageView = itemView.findViewById(R.id.image_view);
+            }
+        }
+    }
+
+    private class Image {
+        private String url;
+
+        public Image(String url) {
+            this.url = url;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
+        }
     }
 
 }
