@@ -262,8 +262,6 @@ public class OtherUser extends AppCompatActivity {
                 Log.e("FirebaseError", "Error getting download URL: " + e.getMessage());
             }
         });
-
-
     }
 
     private void displayPosts() {
