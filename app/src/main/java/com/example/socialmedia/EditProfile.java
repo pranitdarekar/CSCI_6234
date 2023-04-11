@@ -129,8 +129,6 @@ public class EditProfile extends AppCompatActivity {
             }
         });
 
-
-
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
