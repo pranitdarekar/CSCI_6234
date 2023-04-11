@@ -5,6 +5,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -20,6 +21,7 @@ import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -58,7 +60,7 @@ public class MyPage extends AppCompatActivity {
     ImageView profilePictureImage;
     RecyclerView recyclerView;
     ImageAdapter adapter;
-    Button followRequestsButton;
+    Button followRequestsButton, followersButton, followingButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +73,8 @@ public class MyPage extends AppCompatActivity {
         userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         profilePictureImage = findViewById(R.id.profile_image_view);
         followRequestsButton = findViewById(R.id.follow_requests_button);
+        followersButton = findViewById(R.id.followers_button);
+        followingButton = findViewById(R.id.following_button);
 
         recyclerView = findViewById(R.id.images_grid);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
@@ -148,6 +152,76 @@ public class MyPage extends AppCompatActivity {
                 showFollowRequests();
             }
         });
+
+        followersButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showFollowers();
+            }
+        });
+
+        followingButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showFollowing();
+            }
+        });
+    }
+
+    private void showFollowing() {
+        String currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        FirebaseDatabase.getInstance().getReference("FollowRequests/" + currentUser).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<String> following = new ArrayList<>();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    System.out.println(snapshot);
+                    System.out.println(snapshot.getValue());
+                    System.out.println(snapshot.getKey());
+                    if (snapshot.getValue().equals("Accepted")) {
+                        following.add(snapshot.getKey());
+                    }
+                }
+                showFollowersDialog(following);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e("TAG", "Error reading value from database: " + databaseError.getMessage());
+            }
+        });
+    }
+
+    private void showFollowers() {
+        FirebaseDatabase.getInstance().getReference("FollowRequests").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<String> followers = new ArrayList<>();
+                String currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    if (snapshot.hasChild(currentUser) && String.valueOf(snapshot.child(currentUser).getValue()).equals("Accepted")) {
+                        followers.add(snapshot.getKey());
+                    }
+                }
+                showFollowersDialog(followers);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e("TAG", "Error reading value from database: " + databaseError.getMessage());
+            }
+        });
+    }
+
+    private void showFollowersDialog(List<String> list) {
+        // Create a custom dialog with a ListView to display the followers list
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.followers_dialog);
+
+        ListView listView = dialog.findViewById(R.id.followers_list);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, list);
+        listView.setAdapter(adapter);
+        dialog.show();
     }
 
     private void showFollowRequests() {
@@ -163,19 +237,6 @@ public class MyPage extends AppCompatActivity {
                     try {
                         if (requestsObject.has(uid) && requestsObject.getString(uid).equals("Pending")) {
                             String request = ds.getKey();
-                            FirebaseDatabase.getInstance().getReference("path/to/your/node").addValueEventListener(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                    String value = dataSnapshot.getValue(String.class);
-                                    Log.d("TAG", "Value at node: " + value);
-                                }
-
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-                                    Log.e("TAG", "Error reading value from database: " + databaseError.getMessage());
-                                }
-                            });
-
                             followRequests.add(request);
                         }
                     } catch (JSONException e) {
